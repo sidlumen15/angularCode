@@ -91,8 +91,8 @@ export class ShopFront implements OnDestroy {
   get priceKey() {
     return this.cartInfo.service_method + '_price_int';
   }
-  //menu_type_id
-  addItem(item: MenuItem, menuTypeId: number) {
+  
+  addShopItem(item: MenuItem, menuTypeId: number) {
     const modalRef = this.ngbModal.open(ItemModal, {
       centered: true,
       scrollable: true,
@@ -120,7 +120,7 @@ export class ShopFront implements OnDestroy {
     modalRef.result.then(
       (result) => {
         if (result) {
-          this.addItem(result.item, result.menu_type_id);
+          this.addShopItem(result.item, result.menu_type_id);
         }
       },
       (reason) => {
