@@ -1,19 +1,19 @@
 @Component({
-  selector: 'app-outlet-front',
+  selector: 'app-Shop-front',
   imports: [NgbAccordionModule, DecimalPipe, FormsModule, NgbTypeaheadModule, ServiceMethodPipe],
-  templateUrl: './outlet-front.html',
-  styleUrl: './outlet-front.scss',
+  templateUrl: './Shop-front.html',
+  styleUrl: './Shop-front.scss',
 })
-export class OutletFront implements OnDestroy {
+export class ShopFront implements OnDestroy {
   destroy$ = new Subject();
   isLoading = true;
   menus: ShopMenu[] = [];
   alertMessage = '';
-  outletServices: OutletService[] = [];
-  outletData: Outlet | null = null;
+  ShopServices: ShopService[] = [];
+  ShopData: Shop | null = null;
   cartInfo!: Cart;
-  custappDatas: CustomerData[] = [];
-  outletDisabled = false;
+  customerData: CustomerData[] = [];
+  ShopDisabled = false;
 
   @ViewChild('instance', { static: true }) instance!: NgbTypeahead;
 
@@ -37,23 +37,23 @@ export class OutletFront implements OnDestroy {
 
     this.systemService();
     if (this.configService.custappConfig !== null) {
-      this.custappDatas = this.configService.custappConfig.custapp_datas.filter(
+      this.customerData = this.configService.custappConfig.custapp_datas.filter(
         (td) => td.tag == 'menu-top',
       );
     }
 
-    this.outletDetails();
+    this.ShopDetails();
   }
 
-  outletDetails() {
+  ShopDetails() {
     this.dataService
       .myHttp({ type: 'get', uri: 'shop_info', cacheSeconds: 3600 })
       .pipe(take(1))
       .subscribe((resp: ApiResponse) => {
         if (resp.status === 'ok') {
-          this.outletData = resp.data;
+          this.ShopData = resp.data;
           if (resp.data.disable_upto) {
-            this.outletDisabled = this.isOutletDisabled(resp.data.disable_upto);
+            this.ShopDisabled = this.isShopDisabled(resp.data.disable_upto);
           }
         }
       });
@@ -61,16 +61,16 @@ export class OutletFront implements OnDestroy {
 
   systemService() {
     this.dataService
-      .myHttp({ type: 'get', uri: 'outlet_services', cacheSeconds: 3600 })
+      .myHttp({ type: 'get', uri: 'Shop_services', cacheSeconds: 3600 })
       .pipe(take(1))
       .subscribe((resp: ApiResponse) => {
         if (resp.status === 'ok') {
-          resp.data.forEach((svc: OutletService) => {
+          resp.data.forEach((svc: ShopService) => {
             if (svc.service_name == 'collection' || svc.service_name == 'delivery') {
               if (!this.cartInfo.service_method && svc.is_enabled) {
                 this.cartInfo.service_method = svc.service_name;
               }
-              this.outletServices.push(svc);
+              this.ShopServices.push(svc);
             }
           });
 
@@ -129,7 +129,7 @@ export class OutletFront implements OnDestroy {
     );
   }
 
-  isOutletDisabled(disableUpto?: string | null): boolean {
+  isShopDisabled(disableUpto?: string | null): boolean {
     if (!disableUpto) return false;
 
     const now = new Date(); // user local time
